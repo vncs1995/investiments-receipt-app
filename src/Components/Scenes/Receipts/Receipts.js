@@ -1,54 +1,97 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, SectionList, Text } from 'react-native';
-import { Button } from '../../Commons/Buttons/Button';
+import {
+  View, StyleSheet, SectionList, Text
+} from 'react-native';
+import { CircleButton } from '../../Commons/Buttons/CircleButton';
 import { colors } from '../../../constants/colors';
+import { CardReceipt } from '../../Commons/Cards/CardReceipt';
 
 export default class Receipt extends Component {
+  state = {
+    fetchedData: [
+      {
+        month: new Date().toLocaleString('en-us', { month: 'long' }),
+        year: new Date().getFullYear(),
+        cashIn: [{
+          date: new Date().toISOString(),
+          amount: 239.12
+        }],
+        cashOut: [{
+          date: new Date().toISOString(),
+          amount: 1500.20
+        }]
+      },
+      {
+        month: new Date().toLocaleString('en-us', { month: 'long' }),
+        year: new Date().getFullYear(),
+        cashIn: [{
+          date: new Date().toISOString(),
+          amount: 239.12
+        }],
+        cashOut: [{
+          date: new Date().toISOString(),
+          amount: 1500.20
+        }]
+      }
+    ]
+  }
 
-    redirectTo(operation) {
-        this.props.navigation.navigate('ChangeValue', { operation })
+  getSections() {
+    const { fetchedData } = this.state;
+    console.log('fetchedData');
+    if (fetchedData) {
+      return fetchedData.map(data => ({
+        title: `${data.month} ${data.year}`,
+        data: data.cashIn.concat(data.cashOut)
+      }));
+    } else {
+      console.log('NO fetchedData');
     }
+  }
 
-    render() {
-        return (
-            <View style={styles.container}>
+  redirectTo(operation) {
+    const { navigate } = this.props.navigation;
+    navigate('ChangeValue', { operation });
+  }
 
-                <View style={{ flex: 6, marginHorizontal: 20 }}>
-                    <SectionList
-                        indicatorStyle={'white'}
-                        renderItem={({ item, index, section }) => <Text style={{ margin: 10 }} key={index}>{item}</Text>}
-                        renderSectionHeader={({ section: { title } }) => (
-                            <Text style={{ fontWeight: 'bold', marginVertical: 20 }}>{title}</Text>
-                        )}
-                        sections={[
-                            { title: 'Cash-In', data: ['item1', 'item2'] },
-                            { title: 'Cash-Out', data: ['item3', 'item4'] },
-                        ]}
-                        keyExtractor={(item, index) => item + index}
-                    />
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{ flex: 6, marginHorizontal: 20 }}>
+          <SectionList
+            indicatorStyle="white"
+            renderItem={({ item, index, section }) => <CardReceipt receiptData={item} />}
+            renderSectionHeader={({ section: { title } }) => (
+              <Text style={{ fontWeight: 'bold', marginVertical: 20, color: colors.purple }}>{title}</Text>
+            )}
+            sections={this.getSections()}
+            keyExtractor={(item, index) => item + index}
+          />
 
-                </View>
+        </View>
 
-                <View style={styles.buttonContainer}>
-                    <Button
-                        label={'+'}
-                        onPress={this.redirectTo.bind(this, 'add')}
-                        color={colors.aqua}
-                    />
+        <View style={styles.buttonContainer}>
+          <CircleButton
+            label="+"
+            onPress={() => this.redirectTo('add')}
+            color={colors.aqua}
+          />
 
-                    <Button
-                        label={'-'}
-                        onPress={this.redirectTo.bind(this, 'sub')}
-                        color={colors.coral}
-                    />
-                </View>
+          <CircleButton
+            label="-"
+            onPress={() => this.redirectTo('sub')}
+            color={colors.coral}
+          />
+        </View>
 
-            </View>
-        );
-    }
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: colors.background, justifyContent: 'center' },
-    buttonContainer: { flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', marginHorizontal: 20, marginBottom: 40 },
+  container: { flex: 1, backgroundColor: colors.background, justifyContent: 'center' },
+  buttonContainer: {
+    flex: 1, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', marginHorizontal: 20, marginBottom: 40
+  },
 });
